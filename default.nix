@@ -29,7 +29,7 @@ let
     beholderCommand "open-interest-summary --csv ${csv} --interval ${interval} --limit ${builtins.toString limit}";
 in
 {
-  mkBeholderScript =
+  mkBeholderScriptBin =
     {
       name,
       interval,
