@@ -14,7 +14,6 @@
       self,
       nixpkgs,
       beholder,
-      ...
     }:
     {
       nixosModules.default =
