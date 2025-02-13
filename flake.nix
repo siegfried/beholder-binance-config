@@ -43,9 +43,24 @@
               serviceConfig = config.services.beholder;
               startAt = lib.mkIf (serviceConfig != null) serviceConfig.startAt;
               beholderPkg = beholder.packages.${pkgs.system}.default;
-              beholderScripts = pkgs.callPackage ./default.nix {
+              beholderBinanceConfig = pkgs.callPackage ./default.nix {
                 beholder = beholderPkg;
                 beholderDatabase = serviceConfig.databaseURL;
+              };
+              beholder-daily-1d-script = beholderBinanceConfig.mkBeholderScriptBin {
+                name = "beholder-daily-1d";
+                interval = "1d";
+                limit = 10;
+              };
+              beholder-daily-1h-script = beholderBinanceConfig.mkBeholderScriptBin {
+                name = "beholder-daily-1h";
+                interval = "1h";
+                limit = 120;
+              };
+              beholder-daily-15m-script = beholderBinanceConfig.mkBeholderScriptBin {
+                name = "beholder-daily-15m";
+                interval = "15m";
+                limit = 500;
               };
               user = "beholder";
               group = "beholder";
@@ -55,10 +70,10 @@
                 inherit group;
                 packages = [
                   beholderPkg
-                  beholderScripts.beholder-all-script
-                  beholderScripts.beholder-daily-1d-script
-                  beholderScripts.beholder-daily-1h-script
-                  beholderScripts.beholder-daily-15m-script
+                  beholderBinanceConfig.beholder-all-script
+                  beholder-daily-1d-script
+                  beholder-daily-1h-script
+                  beholder-daily-15m-script
                 ];
               };
 
@@ -67,7 +82,7 @@
               systemd = {
                 services.beholder-daily-1d = {
                   description = "Beholder Daily Data Import 1d";
-                  script = lib.getExe beholderScripts.beholder-daily-1d-script;
+                  script = lib.getExe beholder-daily-1d-script;
                   after = [ "network.target" ];
                   serviceConfig = {
                     Type = "oneshot";
@@ -78,7 +93,7 @@
                 };
                 services.beholder-daily-1h = {
                   description = "Beholder Daily Data Import 1h";
-                  script = lib.getExe beholderScripts.beholder-daily-1h-script;
+                  script = lib.getExe beholder-daily-1h-script;
                   after = [ "network.target" ];
                   serviceConfig = {
                     Type = "oneshot";
@@ -89,7 +104,7 @@
                 };
                 services.beholder-daily-15m = {
                   description = "Beholder Daily Data Import 15m";
-                  script = lib.getExe beholderScripts.beholder-daily-15m-script;
+                  script = lib.getExe beholder-daily-15m-script;
                   after = [ "network.target" ];
                   serviceConfig = {
                     Type = "oneshot";
