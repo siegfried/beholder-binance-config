@@ -67,6 +67,7 @@
             {
               users.users.${user} = {
                 inherit group;
+                isNormalUser = true;
                 packages = [
                   beholderPkg
                   beholderBinanceConfig.beholder-all-script
