@@ -34,6 +34,9 @@
           pkgs = import nixpkgs {
             inherit system;
           };
+          writeRscript = pkgs.writers.makeScriptWriter {
+            interpreter = "${R}/bin/Rscript";
+          };
           binancerPackage = pkgs.rPackages.buildRPackage {
             name = "binancer";
             src = binancer;
@@ -57,6 +60,24 @@
         in
         {
           inherit R;
+          update-list =
+            writeRscript "/bin/update-usdm-list" # r
+              ''
+                library(binancer)
+                library(dplyr)
+                library(readr)
+
+                binance_exchange_info()$symbols |>
+                  filter(status == "TRADING" & quoteAsset %in% c("BTC", "USDT")) |>
+                  transmute(symbol, interval = "1d", limit = 1000L) |> arrange(symbol) |>
+                  write_csv("spot_queries.csv")
+
+                usdm_v1_exchange_info()$symbols |>
+                  filter(status == "TRADING" & contractType == "PERPETUAL" & quoteAsset == "USDT")|>
+                  transmute(symbol, interval = "1d", limit = 1500L) |>
+                  arrange(symbol) |>
+                  write_csv("usdm_queries.csv")
+              '';
         }
       );
 
