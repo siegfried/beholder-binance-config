@@ -2,10 +2,14 @@
   description = "A flake for beholder on Binance";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     beholder = {
       url = "github:siegfried/beholder";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    binancer = {
+      url = "github:siegfried/binancer/usdm-support";
+      flake = false;
     };
   };
 
@@ -14,8 +18,65 @@
       self,
       nixpkgs,
       beholder,
+      binancer,
     }:
+    let
+      supportedSystems = [
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+    in
     {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+          };
+          binancerPackage = pkgs.rPackages.buildRPackage {
+            name = "binancer";
+            src = binancer;
+            propagatedBuildInputs = with pkgs.rPackages; [
+              data_table
+              httr
+              digest
+              snakecase
+              logger
+              jsonlite
+            ];
+          };
+          R = pkgs.rWrapper.override {
+            packages =
+              [ binancerPackage ]
+              ++ (with pkgs.rPackages; [
+                dplyr
+                readr
+              ]);
+          };
+        in
+        {
+          inherit R;
+        }
+      );
+
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              self.packages.${pkgs.system}.R
+            ];
+            shellHook = ''
+              R
+            '';
+          };
+        }
+      );
+
       nixosModules.default =
         {
           config,

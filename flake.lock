@@ -20,18 +20,35 @@
         "type": "github"
       }
     },
+    "binancer": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1701016053,
+        "narHash": "sha256-fXyZr2DaUVfO1LmvK7cRaPTV3zJPDYoIuZQCCc6z8pM=",
+        "owner": "siegfried",
+        "repo": "binancer",
+        "rev": "f343d4d4cdb03de03447c1f3149450bb26687fe0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "siegfried",
+        "ref": "usdm-support",
+        "repo": "binancer",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1739206421,
-        "narHash": "sha256-PwQASeL2cGVmrtQYlrBur0U20Xy07uSWVnFup2PHnDs=",
+        "lastModified": 1741379970,
+        "narHash": "sha256-Wh7esNh7G24qYleLvgOSY/7HlDUzWaL/n4qzlBePpiw=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "44534bc021b85c8d78e465021e21f33b856e2540",
+        "rev": "36fd87baa9083f34f7f5027900b62ee6d09b1f2f",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-24.11",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -39,6 +56,7 @@
     "root": {
       "inputs": {
         "beholder": "beholder",
+        "binancer": "binancer",
         "nixpkgs": "nixpkgs"
       }
     }
