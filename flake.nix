@@ -50,12 +50,13 @@
             ];
           };
           R = pkgs.rWrapper.override {
-            packages =
-              [ binancerPackage ]
-              ++ (with pkgs.rPackages; [
-                dplyr
-                readr
-              ]);
+            packages = [
+              binancerPackage
+            ]
+            ++ (with pkgs.rPackages; [
+              dplyr
+              readr
+            ]);
           };
         in
         {
@@ -89,7 +90,7 @@
         {
           default = pkgs.mkShell {
             packages = [
-              self.packages.${pkgs.system}.R
+              self.packages.${pkgs.stdenv.hostPlatform.system}.R
             ];
             shellHook = ''
               R
@@ -123,7 +124,7 @@
             let
               serviceConfig = config.services.beholder;
               startAt = lib.mkIf (serviceConfig != null) serviceConfig.startAt;
-              beholderPkg = beholder.packages.${pkgs.system}.default;
+              beholderPkg = beholder.packages.${pkgs.stdenv.hostPlatform.system}.default;
               beholderBinanceConfig = pkgs.callPackage ./default.nix {
                 beholder = beholderPkg;
                 beholderDatabase = serviceConfig.databaseURL;
